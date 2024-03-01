@@ -30,7 +30,13 @@ class CStock
 public:
 	CStock();
 	virtual ~CStock();
-// ¸â¹ö º¯¼ö
+
+public:
+	void Run();
+	void ReadDataFromFile();
+	void WriteDataToFile();
+	
+	// ¸â¹ö º¯¼ö
 public:
 	AllCompany allCompanies;
 };

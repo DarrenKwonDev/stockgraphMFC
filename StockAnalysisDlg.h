@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "CStock.h"
 
 
 // CStockAnalysisDlg 대화 상자
@@ -33,4 +34,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButtonRun();
+
+private:
+	CStock* stock;
+
 };
