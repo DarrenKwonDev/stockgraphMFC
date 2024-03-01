@@ -11,7 +11,9 @@ CStock::~CStock()
 
 void CStock::Run()
 {
-	AfxMessageBox(_T("run~"));
+	ReadDataFromFile();
+	WriteDataToFile();
+	AfxMessageBox(_T("success!"));
 }
 
 void CStock::ReadDataFromFile()
@@ -19,7 +21,7 @@ void CStock::ReadDataFromFile()
 	int cn;
 	FILE* fp;
 
-	fp = fopen("./data.txt", "rt");
+	fp = fopen("../data.txt", "rt");
 	if (fp == NULL)
 	{
 		AfxMessageBox(_T("data.txt file is not opened"));
@@ -78,5 +80,36 @@ void CStock::ReadDataFromFile()
 
 void CStock::WriteDataToFile()
 {
-	
+	FILE* fp;
+	fp = fopen("data2.txt", "wt");
+	if (fp == NULL)
+	{
+		AfxMessageBox(_T("data2.txt file is not opened"));
+		exit(1);
+	}
+
+	fprintf(fp, "%d \n", allCompanies.quantity);
+	for (int i = 0; i < allCompanies.quantity; i++)
+	{
+		// CString -> const TCHAR* -> char*
+		fprintf(fp, "%s %s %d \n",
+			LPSTR(LPCTSTR(allCompanies.companies[i].strJongMok)), // CString to char*
+			LPSTR(LPCTSTR(allCompanies.companies[i].strName)),
+			allCompanies.companies[i].quantity
+		);
+
+		for (int j = 0; j < allCompanies.companies[i].quantity; j++)
+		{
+		
+			fprintf(fp, "%ld %ld %ld %ld %ld %ld \n",
+				allCompanies.companies[i].data[j].date,
+				allCompanies.companies[i].data[j].startVal,
+				allCompanies.companies[i].data[j].highVal,
+				allCompanies.companies[i].data[j].lowVal,
+				allCompanies.companies[i].data[j].lastVal,
+				allCompanies.companies[i].data[j].vol
+				);
+		}
+	}
+	fclose(fp);
 }
