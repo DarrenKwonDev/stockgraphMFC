@@ -38,4 +38,11 @@ public:
 private:
 	CStock* stock;
 
+// 핸들러
+public:
+	afx_msg void OnCbnSelchangeComboJongmok();
+
+// 멤버 변수
+public:
+	CComboBox m_jongmok;
 };

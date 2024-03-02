@@ -24,6 +24,11 @@ struct AllCompany {
 	Company companies[MAX_COMPANY];
 };
 
+struct SelectedCompany {
+	int quantity;
+	Company* companies[MAX_COMPANY];
+};
+
 class CStock
 {
 // 생성자와 소멸자
@@ -35,9 +40,11 @@ public:
 	void Run();
 	void ReadDataFromFile();
 	void WriteDataToFile();
+	void makeSelectedCompanyFromAllCompany();
 	
-	// 멤버 변수
+// 멤버 변수
 public:
 	AllCompany allCompanies;
+	SelectedCompany selectedCompanies;
 };
 

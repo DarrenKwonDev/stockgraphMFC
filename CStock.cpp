@@ -12,7 +12,7 @@ CStock::~CStock()
 void CStock::Run()
 {
 	ReadDataFromFile();
-	WriteDataToFile();
+	makeSelectedCompanyFromAllCompany();
 	AfxMessageBox(_T("success!"));
 }
 
@@ -21,7 +21,7 @@ void CStock::ReadDataFromFile()
 	int cn;
 	FILE* fp;
 
-	fp = fopen("../data.txt", "rt");
+	fp = fopen("data.txt", "rt");
 	if (fp == NULL)
 	{
 		AfxMessageBox(_T("data.txt file is not opened"));
@@ -112,4 +112,14 @@ void CStock::WriteDataToFile()
 		}
 	}
 	fclose(fp);
+}
+
+void CStock::makeSelectedCompanyFromAllCompany()
+{
+	selectedCompanies.quantity = allCompanies.quantity;
+
+	for (int i = 0; i < selectedCompanies.quantity; i++)
+	{
+		selectedCompanies.companies[i] = &allCompanies.companies[i];
+	}
 }

@@ -59,6 +59,7 @@ CStockAnalysisDlg::CStockAnalysisDlg(CWnd* pParent /*=nullptr*/)
 void CStockAnalysisDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO_JONGMOK, m_jongmok);
 }
 
 BEGIN_MESSAGE_MAP(CStockAnalysisDlg, CDialogEx)
@@ -66,6 +67,7 @@ BEGIN_MESSAGE_MAP(CStockAnalysisDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_RUN, &CStockAnalysisDlg::OnBnClickedButtonRun)
+	ON_CBN_SELCHANGE(IDC_COMBO_JONGMOK, &CStockAnalysisDlg::OnCbnSelchangeComboJongmok)
 END_MESSAGE_MAP()
 
 
@@ -161,4 +163,21 @@ void CStockAnalysisDlg::OnBnClickedButtonRun()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	stock->Run();
+
+	m_jongmok.ResetContent();
+
+	for (int i = 0; i < stock->selectedCompanies.quantity; i++)
+	{
+		m_jongmok.AddString(stock->selectedCompanies.companies[i]->strName);
+	}
+	
+	m_jongmok.SetCurSel(0);
+	UpdateData(FALSE); // 값 -> 컨트롤 (UI 반영)
+	RedrawWindow(); 
+}
+
+
+void CStockAnalysisDlg::OnCbnSelchangeComboJongmok()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }
