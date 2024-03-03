@@ -269,6 +269,42 @@ void CStockAnalysisDlg::DrawGraph()
 		dc.LineTo(ptData->volume.point[i].X, ptData->volume.point[i].Y);
 	}
 
+	// move avg
+	CPen avg5Pen, avg20Pen, avg60Pen, avg120Pen;
+	avg5Pen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+	avg20Pen.CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+	avg60Pen.CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
+	avg120Pen.CreatePen(PS_SOLID, 1, RGB(0, 255, 255));
+
+	dc.SelectObject(avg5Pen);
+	dc.MoveTo(ptData->avg5.point[0].X, ptData->avg5.point[0].Y);
+	for (i = 1; i < ptData->avg5.quantity; i++)
+	{
+		dc.LineTo(ptData->avg5.point[i].X, ptData->avg5.point[i].Y);
+	}
+
+	dc.SelectObject(avg20Pen);
+	dc.MoveTo(ptData->avg20.point[0].X, ptData->avg20.point[0].Y);
+	for (i = 1; i < ptData->avg20.quantity; i++)
+	{
+		dc.LineTo(ptData->avg20.point[i].X, ptData->avg20.point[i].Y);
+	}
+
+	dc.SelectObject(avg60Pen);
+	dc.MoveTo(ptData->avg60.point[0].X, ptData->avg60.point[0].Y);
+	for (i = 1; i < ptData->avg60.quantity; i++)
+	{
+		dc.LineTo(ptData->avg60.point[i].X, ptData->avg60.point[i].Y);
+	}
+
+	dc.SelectObject(avg120Pen);
+	dc.MoveTo(ptData->avg120.point[0].X, ptData->avg120.point[0].Y);
+	for (i = 1; i < ptData->avg120.quantity; i++)
+	{
+		dc.LineTo(ptData->avg120.point[i].X, ptData->avg120.point[i].Y);
+	}
+
+
 	// write text
 	int maxVal, minVal, maxVol;
 	int quantity = stock->ptrCompany->quantity;
@@ -310,6 +346,8 @@ void CStockAnalysisDlg::DrawGraph()
 
 	str.Format("- %d", maxVol);
 	dc.TextOutA(WIDTH_GRAPH + 13, HEIGHT_GRAPH + GAP_GRAPH_VOLUME, str, str.GetLength());
+	
+
 }
 
 void CStockAnalysisDlg::OnCbnSelchangeComboJongmok()

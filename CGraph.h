@@ -31,6 +31,12 @@ struct PointData {
 	PointArray lowVal;
 	PointArray lastVal;
 	PointArray volume;
+
+	// mov avg
+	PointArray avg5;
+	PointArray avg20;
+	PointArray avg60;
+	PointArray avg120;
 };
 
 class CGraph

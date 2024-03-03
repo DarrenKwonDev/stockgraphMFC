@@ -13,6 +13,7 @@ void CStock::Run()
 {
 	ReadDataFromFile();
 	makeSelectedCompanyFromAllCompany();
+	makeMovementAverage();
 	AfxMessageBox(_T("success!"));
 }
 
@@ -100,7 +101,7 @@ void CStock::WriteDataToFile()
 
 		for (int j = 0; j < allCompanies.companies[i].quantity; j++)
 		{
-		
+
 			fprintf(fp, "%ld %ld %ld %ld %ld %ld \n",
 				allCompanies.companies[i].data[j].date,
 				allCompanies.companies[i].data[j].startVal,
@@ -108,7 +109,7 @@ void CStock::WriteDataToFile()
 				allCompanies.companies[i].data[j].lowVal,
 				allCompanies.companies[i].data[j].lastVal,
 				allCompanies.companies[i].data[j].vol
-				);
+			);
 		}
 	}
 	fclose(fp);
@@ -121,5 +122,64 @@ void CStock::makeSelectedCompanyFromAllCompany()
 	for (int i = 0; i < selectedCompanies.quantity; i++)
 	{
 		selectedCompanies.companies[i] = &allCompanies.companies[i];
+	}
+}
+
+void CStock::makeMovementAverage()
+{
+	int i, j, k;
+	long sum;
+
+	for (i = 0; i < allCompanies.quantity; i++)
+	{
+		Company* company = &allCompanies.companies[i];
+		int quantity = company->quantity;
+
+		// 5일 이평을 그립니다.
+		for (j = 0; j <= quantity - 5; j++)
+		{
+			sum = 0;
+			for (k = j; k < j + 5; k++)
+			{
+				// 종가 기준 이평이므로 종가를 더합니다.
+				sum += company->data[k].lastVal;
+			}
+			// 결과적으로, 현재 일 기준 + 5일간의 이평을 그리게 됩니다.
+			company->moveAverage[j].avg5 = (long)(sum / 5);
+		}
+
+		// 20일 이평 그리기
+		for (j = 0; j <= quantity - 20; j++)
+		{
+			sum = 0;
+			for (k = j; k < j + 5; k++)
+			{
+				sum += company->data[k].lastVal;
+			}
+			company->moveAverage[j].avg20 = (long)(sum / 20);
+		}
+
+		// 60일 이평 그리기
+		for (j = 0; j <= quantity - 60; j++)
+		{
+			sum = 0;
+			for (k = j; k < j + 60; k++)
+			{
+				sum += company->data[k].lastVal;
+			}
+			company->moveAverage[j].avg60 = (long)(sum / 60);
+		}
+
+
+		// 120일 이평 그리기
+		for (j = 0; j <= quantity - 120; j++)
+		{
+			sum = 0;
+			for (k = j; k < j + 120; k++)
+			{
+				sum += company->data[k].lastVal;
+			}
+			company->moveAverage[j].avg120 = (long)(sum / 120);
+		}
 	}
 }
