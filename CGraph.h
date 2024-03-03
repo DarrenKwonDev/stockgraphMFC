@@ -4,8 +4,8 @@
 #define X_START_GRAPH (10)
 #define Y_START_GRAPH (10)
 
-#define WIDTH_GRAPH (1000)
-#define HEIGHT_GRAPH (400)
+#define WIDTH_GRAPH (800)
+#define HEIGHT_GRAPH (300)
 
 #define HEIGHT_VOLUME (150)
 
