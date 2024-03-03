@@ -22,9 +22,6 @@ void CGraph::GetDataForChart(Company* company, PointData* ptData)
 {
 	int i, maxVal, minVal, maxVol, interval;
 
-	
-
-
 	// 종목이 가진 값 중 가장 높은 값을 찾습니다.
 	// 왜냐하면 그래프 최대 높이 기준이 필요하거든요.
 	maxVal = 0;
@@ -74,6 +71,13 @@ void CGraph::GetDataForChart(Company* company, PointData* ptData)
 	for (int i = 0; i < ptData->startVal.quantity; i++)
 	{
 		ptData->startVal.point[i].X = x_end - (i * interval);
+		
+		// 데이터 포인터가 화면상 차지하는 높이를 계산해야 함.
+		// graph의 최대 높이 차이는 (maxVal - minVal)
+		// 여기서 해당 한 포인트의 높이는 (startVal - minVal)
+		// Y (화면상 차지하는 높이) 를 구하기 위한 비례식은,
+		// (maxVal - minVal) : (company->data[i].startVal - minVal) = HEIGHT_GRAPH : Y
+		// Y = HEIGHT_GRAPH * (company->data[i].startVal - minVal) / (maxVal - minVal) 임.
 		ptData->startVal.point[i].Y = y_end - (HEIGHT_GRAPH * (company->data[i].startVal - minVal)) / (maxVal - minVal);
 	}
 	

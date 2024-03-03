@@ -32,15 +32,17 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedButtonRun();
-
-private:
-	CStock* stock;
 
 // 핸들러
 public:
+	afx_msg void OnBnClickedButtonRun();
 	afx_msg void OnCbnSelchangeComboJongmok();
+
+private:
+	CStock* stock;
+	bool flagPaint;
+public:
+	void DrawGraph();
 
 // 멤버 변수
 public:

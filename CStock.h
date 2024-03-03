@@ -46,5 +46,6 @@ public:
 public:
 	AllCompany allCompanies;
 	SelectedCompany selectedCompanies;
+	Company* ptrCompany;
 };
 

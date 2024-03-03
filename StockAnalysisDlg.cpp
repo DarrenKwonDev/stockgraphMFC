@@ -11,6 +11,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "CGraph.h"
 
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
@@ -104,6 +105,7 @@ BOOL CStockAnalysisDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	stock = new CStock();
+	flagPaint = false;
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -127,6 +129,10 @@ void CStockAnalysisDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CStockAnalysisDlg::OnPaint()
 {
+	if (flagPaint)
+	{
+		DrawGraph();
+	}
 	if (IsIconic())
 	{
 		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
@@ -162,22 +168,154 @@ HCURSOR CStockAnalysisDlg::OnQueryDragIcon()
 void CStockAnalysisDlg::OnBnClickedButtonRun()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int i;
+
 	stock->Run();
+	
 
 	m_jongmok.ResetContent();
 
-	for (int i = 0; i < stock->selectedCompanies.quantity; i++)
+	for (i = 0; i < stock->selectedCompanies.quantity; i++)
 	{
 		m_jongmok.AddString(stock->selectedCompanies.companies[i]->strName);
 	}
 	
 	m_jongmok.SetCurSel(0);
 	UpdateData(FALSE); // 값 -> 컨트롤 (UI 반영)
+
+	if (i == 0)
+	{
+		return;
+	}
+
+	stock->ptrCompany = stock->selectedCompanies.companies[0];
+	flagPaint = true;
+
 	RedrawWindow(); 
 }
 
 
+void CStockAnalysisDlg::DrawGraph()
+{
+	int i;
+
+	PointData* ptData = CGraph::GetPointData(stock->ptrCompany);
+
+	CPaintDC dc(this);
+
+	// rect 그리기
+	CBrush whiteBrush(RGB(255, 255, 255));
+	CBrush* oldBrush;
+	CRect rect = {
+		X_START_GRAPH, Y_START_GRAPH, 
+		X_START_GRAPH + WIDTH_GRAPH, Y_START_GRAPH + HEIGHT_GRAPH};
+	dc.FillRect(&rect, &whiteBrush);
+
+	CPen bluePen, redPen, bluePenThick, redPenThick;
+	CPen* oldPen;
+	bluePen.CreatePen(PS_SOLID, WIDTH_LINE, RGB(0, 0, 255));
+	redPen.CreatePen(PS_SOLID, WIDTH_LINE, RGB(255, 0, 0));
+	bluePenThick.CreatePen(PS_SOLID, WIDTH_THICK_LINE, RGB(0, 0, 255));
+	redPenThick.CreatePen(PS_SOLID, WIDTH_THICK_LINE, RGB(255, 0, 0));
+	
+	for ( i = 0; i < stock->ptrCompany->quantity; i++)
+	{
+		// y좌표는 아래로 갈수록 큰 값을 가진다.
+		// 즉, 아래 데이터는 시가가 종가보다 작으므로 양봉이다.
+		bool isBull = ptData->startVal.point[i].Y > ptData->lastVal.point[i].Y;
+		
+		if (isBull)
+		{
+			dc.SelectObject(redPen);
+		}
+		else
+		{
+			dc.SelectObject(bluePen);
+		}
+		dc.MoveTo(ptData->highVal.point[i].X, ptData->highVal.point[i].Y);
+		dc.LineTo(ptData->lowVal.point[i].X, ptData->lowVal.point[i].Y);
+		
+		if (isBull)
+		{
+			dc.SelectObject(redPenThick);
+		}
+		else
+		{
+			dc.SelectObject(bluePenThick);
+		}
+		dc.MoveTo(ptData->startVal.point[i].X, ptData->startVal.point[i].Y);
+		dc.LineTo(ptData->lastVal.point[i].X, ptData->lastVal.point[i].Y);
+	}
+
+	// volume chart
+	int yOriginVolume = Y_START_GRAPH + HEIGHT_GRAPH + GAP_GRAPH_VOLUME + HEIGHT_VOLUME;
+	CRect rect2 = {
+		X_START_GRAPH, Y_START_GRAPH + HEIGHT_GRAPH + GAP_GRAPH_VOLUME,
+		X_START_GRAPH + WIDTH_GRAPH, yOriginVolume
+	};
+	dc.FillRect(&rect2, &whiteBrush);
+
+	for ( i = 0; i < stock->ptrCompany->quantity - 1; i++)
+	{
+		if (ptData->volume.point[i].Y < ptData->volume.point[i + 1].Y)
+		{
+			dc.SelectObject(redPenThick);
+		}
+		else
+		{
+			dc.SelectObject(bluePenThick);
+		}
+		dc.MoveTo(ptData->volume.point[i].X, yOriginVolume);
+		dc.LineTo(ptData->volume.point[i].X, ptData->volume.point[i].Y);
+	}
+
+	// write text
+	int maxVal, minVal, maxVol;
+	int quantity = stock->ptrCompany->quantity;
+	
+	maxVal = 0;
+	for (i = 0; i < quantity; i++)
+	{
+		if (stock->ptrCompany->data[i].highVal > maxVal)
+		{
+			maxVal = stock->ptrCompany->data[i].highVal;
+		}
+	}
+
+	minVal = maxVal;
+	for ( i = 0; i < quantity; i++)
+	{
+		if (stock->ptrCompany->data[i].lowVal < minVal)
+		{
+			minVal = stock->ptrCompany->data[i].lowVal;
+		}
+	}
+
+	maxVol = 0;
+	for ( i = 0; i < quantity; i++)
+	{
+		if (stock->ptrCompany->data[i].vol > maxVol)
+		{
+			maxVol = stock->ptrCompany->data[i].vol;
+		}
+	}
+
+	CString str;
+	str.Format("- %d 원", maxVal);
+	dc.TextOutA(WIDTH_GRAPH + 13, 5, str, str.GetLength());
+	
+
+	str.Format("- %d 원", minVal);
+	dc.TextOutA(WIDTH_GRAPH + 13, HEIGHT_GRAPH, str, str.GetLength());
+
+	str.Format("- %d", maxVol);
+	dc.TextOutA(WIDTH_GRAPH + 13, HEIGHT_GRAPH + GAP_GRAPH_VOLUME, str, str.GetLength());
+}
+
 void CStockAnalysisDlg::OnCbnSelchangeComboJongmok()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int index = m_jongmok.GetCurSel();
+	stock->ptrCompany = stock->selectedCompanies.companies[index];
+	RedrawWindow();
 }
